@@ -20,7 +20,7 @@ app.use(express.json())
 app.get('/foodwaste', async (req, res) => {
     try {
         let connection = await mysql.createConnection(dbConfig)
-        const [rows] = await connection.query("SELECT * FROM C346_CA2_DB_blankopen.food_waste_entries")
+        const [rows] = await connection.query("SELECT * FROM defaultdb.food_waste_entries")
         res.json(rows);
     }
     catch(err) {
