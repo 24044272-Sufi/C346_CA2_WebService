@@ -28,3 +28,7 @@ app.get('/foodwaste', async (req, res) => {
         res.status(500).json({message: "Server error for food_waste"})
     }
 })
+
+app.listen(port, () => {
+    console.log("Server running on port", port)
+})
