@@ -29,6 +29,56 @@ app.get('/foodwaste', async (req, res) => {
     }
 })
 
+app.post('/addfoodwaste', async (req, res) => {
+    const {category, weight, waste_reason} = req.body
+    try {
+        let connection = await mysql.createConnection(dbConfig)
+        await connection.execute('INSERT INTO defaultdb.food_waste_entries (category, weight, waste_reason) VALUES (?, ?, ?)', [category, weight, waste_reason])
+        res.status(201).json({message: `Food waste entry for ${category} added successfully`})
+    }
+    catch(err) {
+        console.error(err);
+        res.status(500).json({message: "Server error - could not add food waste entry for " + category})
+    }
+})
+
+app.delete('/deletefoodwaste/:id', async (req, res) => {
+    const {id} = req.params
+    try {
+        let connection = await mysql.createConnection(dbConfig)
+        const [result] = await connection.execute('DELETE FROM defaultdb.food_waste_entries WHERE id = ?', [id])
+        
+        if (result.affectedRows === 0) {
+            res.status(404).json({message: `Food waste entry with id ${id} not found`})
+        } else {
+            res.status(200).json({message: `Food waste entry with id ${id} deleted successfully`})
+        }
+    }
+    catch(err) {
+        console.error(err);
+        res.status(500).json({message: "Server error - could not delete food waste entry with id " + id})
+    }
+})
+
+app.put('/updatefoodwaste/:id', async (req, res) => {
+    const {id} = req.params
+    const {category, weight, waste_reason} = req.body
+    try {
+        let connection = await mysql.createConnection(dbConfig)
+        const [result] = await connection.execute('UPDATE defaultdb.food_waste_entries SET category = ?, weight = ?, waste_reason = ? WHERE id = ?', [category, weight, waste_reason, id])
+        
+        if (result.affectedRows === 0) {
+            res.status(404).json({message: `Food waste entry with id ${id} not found`})
+        } else {
+            res.status(200).json({message: `Food waste entry for ${category} updated successfully`})
+        }
+    }
+    catch(err) {
+        console.error(err);
+        res.status(500).json({message: "Server error - could not update food waste entry with id " + id})
+    }
+})
+
 app.listen(port, () => {
     console.log("Server running on port", port)
 })
