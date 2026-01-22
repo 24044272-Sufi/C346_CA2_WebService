@@ -25,7 +25,7 @@ app.get('/foodwaste', async (req, res) => {
     }
     catch(err) {
         console.error(err);
-        res.status(500).json({message: "Server error for food_waste"})
+        res.status(500).json({message: "Server error for food_waste", reason: "Aiven Database is down, please power on service"})
     }
 })
 
@@ -38,7 +38,7 @@ app.post('/addfoodwaste', async (req, res) => {
     }
     catch(err) {
         console.error(err);
-        res.status(500).json({message: "Server error - could not add food waste entry for " + category})
+        res.status(500).json({message: "Server error - could not add food waste entry for " + category, reason: "Aiven Database is down, please power on service"})
     }
 })
 
@@ -56,7 +56,7 @@ app.delete('/deletefoodwaste/:id', async (req, res) => {
     }
     catch(err) {
         console.error(err);
-        res.status(500).json({message: "Server error - could not delete food waste entry with id " + id})
+        res.status(500).json({message: "Server error - could not delete food waste entry with id " + id, reason: "Aiven Database is down, please power on service"})
     }
 })
 
@@ -75,7 +75,7 @@ app.put('/updatefoodwaste/:id', async (req, res) => {
     }
     catch(err) {
         console.error(err);
-        res.status(500).json({message: "Server error - could not update food waste entry with id " + id})
+        res.status(500).json({message: "Server error - could not update food waste entry with id " + id, reason: "Aiven Database is down, please power on service"})
     }
 })
 
