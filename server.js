@@ -14,13 +14,16 @@ const dbConfig = {
     queueLimit: 0,
 }
 
+// Create the pool once when the app starts
+const pool = mysql.createPool(dbConfig)
+
 const app = express()
 app.use(express.json())
 
 app.get('/foodwaste', async (req, res) => {
     try {
-        let connection = await mysql.createConnection(dbConfig)
-        const [rows] = await connection.query("SELECT * FROM defaultdb.food_waste_entries")
+        // Get a connection from the pool
+        const [rows] = await pool.query("SELECT * FROM defaultdb.food_waste_entries")
         res.json(rows);
     }
     catch(err) {
@@ -32,8 +35,7 @@ app.get('/foodwaste', async (req, res) => {
 app.post('/addfoodwaste', async (req, res) => {
     const {category, weight, waste_reason} = req.body
     try {
-        let connection = await mysql.createConnection(dbConfig)
-        await connection.execute('INSERT INTO defaultdb.food_waste_entries (category, weight, waste_reason) VALUES (?, ?, ?)', [category, weight, waste_reason])
+        await pool.execute('INSERT INTO defaultdb.food_waste_entries (category, weight, waste_reason) VALUES (?, ?, ?)', [category, weight, waste_reason])
         res.status(201).json({message: `Food waste entry for ${category} added successfully`})
     }
     catch(err) {
@@ -45,8 +47,7 @@ app.post('/addfoodwaste', async (req, res) => {
 app.delete('/deletefoodwaste/:id', async (req, res) => {
     const {id} = req.params
     try {
-        let connection = await mysql.createConnection(dbConfig)
-        const [result] = await connection.execute('DELETE FROM defaultdb.food_waste_entries WHERE id = ?', [id])
+        const [result] = await pool.execute('DELETE FROM defaultdb.food_waste_entries WHERE id = ?', [id])
         
         if (result.affectedRows === 0) {
             res.status(404).json({message: `Food waste entry with id ${id} not found`})
@@ -64,8 +65,7 @@ app.put('/updatefoodwaste/:id', async (req, res) => {
     const {id} = req.params
     const {category, weight, waste_reason} = req.body
     try {
-        let connection = await mysql.createConnection(dbConfig)
-        const [result] = await connection.execute('UPDATE defaultdb.food_waste_entries SET category = ?, weight = ?, waste_reason = ? WHERE id = ?', [category, weight, waste_reason, id])
+        const [result] = await pool.execute('UPDATE defaultdb.food_waste_entries SET category = ?, weight = ?, waste_reason = ? WHERE id = ?', [category, weight, waste_reason, id])
         
         if (result.affectedRows === 0) {
             res.status(404).json({message: `Food waste entry with id ${id} not found`})
